@@ -5,6 +5,7 @@ using System.Linq;
 
 public class SystemObject : MonoBehaviour
 {
+    static protected int frames_lookahead = 500;
 
     [SerializeField]
     protected float gravityPull;
@@ -30,9 +31,19 @@ public class SystemObject : MonoBehaviour
         projectedLocations = new List<Vector2>();
     }
 
-    virtual protected void PerFrameActions()
+    virtual public void PerFrameActions()
     {
-
+        projectedLocations.Clear();
+        for (int i = 0; i < frames_lookahead; i++)
+        {
+            AddProjectedLocation(i);
+        }
+        foreach (GameObject parent in gravityParents)
+        {
+            velocity += VelocityVectorDelta(parent, 0);
+        }
+        transform.position = (Vector2)transform.position + Vector2.Scale(velocity, frameScale);
+        lastProjectedVelocity = velocity;
     }
 
     Vector2 VelocityVectorDelta(GameObject parent, int framePlus)
@@ -43,8 +54,8 @@ public class SystemObject : MonoBehaviour
         if (framePlus > 0)
         {
             if (framePlus > parentSystemObject.projectedLocations.Count)
-                parentSystemObject.AddProjectedLocation(framePlus - 1);
-            parentPosition = parentSystemObject.projectedLocations[framePlus - 1];
+                parentSystemObject.AddProjectedLocation(framePlus);
+            parentPosition = parentSystemObject.projectedLocations[framePlus];
         }
         Vector2 myPosition = transform.position;
         if (framePlus > 0)
@@ -65,19 +76,6 @@ public class SystemObject : MonoBehaviour
         if (framePlus == 0)
             projectedLocations.Add((Vector2)transform.position + Vector2.Scale(lastProjectedVelocity, frameScale));
         else
-            projectedLocations.Add(projectedLocations.Last() + Vector2.Scale(lastProjectedVelocity, frameScale));
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        foreach (GameObject parent in gravityParents)
-        {
-            velocity += VelocityVectorDelta(parent, 0);
-        }
-        transform.position = (Vector2)transform.position + Vector2.Scale(velocity, frameScale);
-        projectedLocations.Clear();
-        lastProjectedVelocity = velocity;
-        PerFrameActions();
+            projectedLocations.Add(projectedLocations[framePlus - 1] + Vector2.Scale(lastProjectedVelocity, frameScale));
     }
 }

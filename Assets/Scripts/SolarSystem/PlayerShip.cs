@@ -5,7 +5,6 @@ using System;
 
 public class PlayerShip : SystemObject
 {
-    static int frames_lookahead = 500;
 
     LineRenderer lookAheadLines;
 
@@ -25,12 +24,9 @@ public class PlayerShip : SystemObject
         lookAheadLines = line;
     }
 
-    override protected void PerFrameActions()
+    override public void PerFrameActions()
     {
-        for (int i = 0; i < frames_lookahead;  i++)
-        {
-            AddProjectedLocation(i);
-        }
+        base.PerFrameActions();
         if (lookAheadLines != null)
             Destroy(lookAheadLines.gameObject);
         LineBetweenPositions(projectedLocations);
