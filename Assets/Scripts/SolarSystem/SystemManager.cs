@@ -5,6 +5,7 @@ using System.Linq;
 
 public class SystemManager : MonoBehaviour
 {
+    // These should be in tree order (stars first, then planets, then moons, then player)
     [SerializeField]
     List<SystemObject> systemObjects;
 
@@ -18,8 +19,6 @@ public class SystemManager : MonoBehaviour
     void Update()
     {
         foreach (SystemObject o in systemObjects)
-        {
             o.PerFrameActions();
-        }
     }
 }

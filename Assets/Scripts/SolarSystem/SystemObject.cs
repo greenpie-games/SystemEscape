@@ -15,7 +15,7 @@ public class SystemObject : MonoBehaviour
 
     // Parents are a tree, meaning there CANNOT BE CIRCULAR RELATIONSHIPS.
     [SerializeField]
-    GameObject[] gravityParents;
+    protected GameObject[] gravityParents;
 
     protected Vector2 velocity;
 
@@ -25,7 +25,7 @@ public class SystemObject : MonoBehaviour
     static Vector2 frameScale = new Vector2(0.01f, 0.01f);
 
     // Start is called before the first frame update
-    void Start()
+    virtual protected void Start()
     {
         velocity = initialVelocity;
         projectedLocations = new List<Vector2>();
@@ -35,33 +35,34 @@ public class SystemObject : MonoBehaviour
     {
         projectedLocations.Clear();
         for (int i = 0; i < frames_lookahead; i++)
-        {
             AddProjectedLocation(i);
-        }
         foreach (GameObject parent in gravityParents)
-        {
             velocity += VelocityVectorDelta(parent, 0);
-        }
         transform.position = (Vector2)transform.position + Vector2.Scale(velocity, frameScale);
         lastProjectedVelocity = velocity;
+    }
+
+    public Vector2 PositionAtTime(int framePlus)
+    {
+        Vector2 myPosition = transform.position;
+        if (framePlus >= 0)
+        {
+            if (1 + framePlus > projectedLocations.Count)
+            {
+                Debug.LogWarning("Solar system objects out of tree order");
+                AddProjectedLocation(framePlus);
+            }
+            myPosition = projectedLocations[framePlus];
+        }
+        return myPosition;
     }
 
     Vector2 VelocityVectorDelta(GameObject parent, int framePlus)
     {
         SystemObject parentSystemObject = parent.GetComponent<SystemObject>();
         float pull = parentSystemObject.gravityPull;
-        Vector2 parentPosition = parent.transform.position;
-        if (framePlus > 0)
-        {
-            if (framePlus > parentSystemObject.projectedLocations.Count)
-                parentSystemObject.AddProjectedLocation(framePlus);
-            parentPosition = parentSystemObject.projectedLocations[framePlus];
-        }
-        Vector2 myPosition = transform.position;
-        if (framePlus > 0)
-        {
-            myPosition = projectedLocations[framePlus - 1];
-        }
+        Vector2 parentPosition = parentSystemObject.PositionAtTime(framePlus);
+        Vector2 myPosition = PositionAtTime(framePlus - 1);
         float invSquare = 1.0f / (Vector2.Distance(parentPosition, myPosition) * Vector2.Distance(parentPosition, myPosition));
         Vector2 normalizedDirection = (parentPosition - myPosition).normalized;
         return new Vector2(normalizedDirection.x * pull * invSquare, normalizedDirection.y * pull * invSquare);
@@ -70,9 +71,7 @@ public class SystemObject : MonoBehaviour
     protected void AddProjectedLocation(int framePlus)
     {
         foreach (GameObject parent in gravityParents)
-        {
             lastProjectedVelocity += VelocityVectorDelta(parent, framePlus);
-        }
         if (framePlus == 0)
             projectedLocations.Add((Vector2)transform.position + Vector2.Scale(lastProjectedVelocity, frameScale));
         else
