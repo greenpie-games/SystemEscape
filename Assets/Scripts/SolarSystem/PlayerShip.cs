@@ -74,9 +74,9 @@ public class PlayerShip : SystemObject
         foreach (LineRenderer line in lookAheadLines)
             Destroy(line.gameObject);
         lookAheadLines.Clear();
-        LineBetweenPositions(projectedLocations, new Color(.75f, .75f, 1f, .5f));
+        LineBetweenPositions(projectedLocations, new Color(.75f, .75f, 2f, .5f));
         foreach (List<Vector2> flyby in FindAllPredictedFlybys())
-            LineBetweenPositions(flyby, new Color(1f, 1f, 0f, .5f));
+            LineBetweenPositions(flyby, new Color(1f, 1f, 0f, 1f));
         if (Input.GetKey(KeyCode.W))
             velocity.y += 0.01f;
         if (Input.GetKey(KeyCode.S))
