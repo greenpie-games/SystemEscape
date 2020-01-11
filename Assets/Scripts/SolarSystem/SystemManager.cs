@@ -9,6 +9,12 @@ public class SystemManager : MonoBehaviour
     [SerializeField]
     List<SystemObject> systemObjects;
 
+    [SerializeField]
+    PlayerShip player;
+
+    [SerializeField]
+    CameraController mainCameraController;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -18,7 +24,21 @@ public class SystemManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        int gameSpeed = 4;
+        if (player.FindNearbyParent(-1) != null)
+        {
+            mainCameraController.targetLocation = player.FindNearbyParent(-1).transform.position;
+            mainCameraController.targetViewPortSize = 1f;
+            gameSpeed = 1;
+        }
+        else
+        {
+            mainCameraController.targetLocation = new Vector2(0f, 0f);
+            mainCameraController.targetViewPortSize = 5f;
+        }
         foreach (SystemObject o in systemObjects)
-            o.PerFrameActions();
+            o.ComputeNewLocations();
+        foreach (SystemObject o in systemObjects)
+            o.MoveToNextLocation(gameSpeed);
     }
 }

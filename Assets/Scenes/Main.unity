@@ -120,6 +120,36 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &287318020
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 287318021}
+  m_Layer: 0
+  m_Name: Background
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &287318021
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 287318020}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &349076012
 GameObject:
   m_ObjectHideFlags: 0
@@ -170,6 +200,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   systemObjects: []
+  player: {fileID: 977379634}
+  mainCameraController: {fileID: 519420030}
 --- !u!1 &360446240
 GameObject:
   m_ObjectHideFlags: 0
@@ -263,7 +295,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0bfd5c61a4a43040adbc5d7942e4f1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gravityPull: 0.001
+  gravityPull: 0.0002
   initialVelocity: {x: 0.1, y: 1}
   gravityParents:
   - {fileID: 2089962303}
@@ -278,6 +310,7 @@ GameObject:
   - component: {fileID: 519420032}
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
+  - component: {fileID: 519420030}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -293,6 +326,20 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_Enabled: 1
+--- !u!114 &519420030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3663c437429eedd40b00dee4e006075b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetLocation: {x: 0, y: 0}
+  targetViewPortSize: 0
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -517,8 +564,6 @@ MonoBehaviour:
   - {fileID: 1586381255}
   - {fileID: 2042634179}
   - {fileID: 1600296865}
-  AutopilotEnableText: {fileID: 0}
-  AutopilotDisableText: {fileID: 0}
 --- !u!1 &1586381255
 GameObject:
   m_ObjectHideFlags: 0
@@ -612,7 +657,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0bfd5c61a4a43040adbc5d7942e4f1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gravityPull: 0.001
+  gravityPull: 0.0002
   initialVelocity: {x: 0, y: 0.55}
   gravityParents:
   - {fileID: 2089962303}
@@ -709,7 +754,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0bfd5c61a4a43040adbc5d7942e4f1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gravityPull: 0.001
+  gravityPull: 0.0002
   initialVelocity: {x: -0.01, y: 0.41}
   gravityParents:
   - {fileID: 2089962303}
@@ -806,7 +851,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0bfd5c61a4a43040adbc5d7942e4f1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gravityPull: 0.0025
+  gravityPull: 0.0002
   initialVelocity: {x: 0, y: 0.5}
   gravityParents:
   - {fileID: 2089962303}
@@ -854,7 +899,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65f16d91da6e30f468655c2249a2ac9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gravityPull: 0.01
+  gravityPull: 0.0025
   initialVelocity: {x: 0, y: 0}
   gravityParents: []
 --- !u!212 &2089962306

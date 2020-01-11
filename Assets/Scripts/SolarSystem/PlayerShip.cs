@@ -6,9 +6,6 @@ using System.Linq;
 
 public class PlayerShip : SystemObject
 {
-    GameObject AutopilotEnableText;
-    [SerializeField]
-    GameObject AutopilotDisableText;
     List<LineRenderer> lookAheadLines;
     [SerializeField]
 
@@ -30,8 +27,14 @@ public class PlayerShip : SystemObject
         lookAheadLines.Add(line);
     }
 
+    override protected GameObject[] ActiveGravityParents(int iFramePlus)
+    {
+        if (FindNearbyParent(iFramePlus) == null) return gravityParents;
+        return new GameObject[2] { gravityParents[0], FindNearbyParent(iFramePlus) };
+    }
+
     // Finds a nearby parent (if there is one)
-    GameObject FindNearbyParent(int framePlus)
+    public GameObject FindNearbyParent(int framePlus)
     {
         foreach (GameObject parent in gravityParents)
             if (Vector2.Distance(parent.GetComponent<SystemObject>().PositionAtTime(framePlus), PositionAtTime(framePlus)) < 0.4f)
@@ -68,15 +71,8 @@ public class PlayerShip : SystemObject
         lookAheadLines = new List<LineRenderer> { };
     }
 
-    override public void PerFrameActions()
+    override public void ComputeNewLocations()
     {
-        base.PerFrameActions();
-        foreach (LineRenderer line in lookAheadLines)
-            Destroy(line.gameObject);
-        lookAheadLines.Clear();
-        LineBetweenPositions(projectedLocations, new Color(.75f, .75f, 2f, .5f));
-        foreach (List<Vector2> flyby in FindAllPredictedFlybys())
-            LineBetweenPositions(flyby, new Color(1f, 1f, 0f, 1f));
         if (Input.GetKey(KeyCode.W))
             velocity.y += 0.01f;
         if (Input.GetKey(KeyCode.S))
@@ -85,5 +81,12 @@ public class PlayerShip : SystemObject
             velocity.x -= 0.01f;
         if (Input.GetKey(KeyCode.D))
             velocity.x += 0.01f;
+        base.ComputeNewLocations();
+        foreach (LineRenderer line in lookAheadLines)
+            Destroy(line.gameObject);
+        lookAheadLines.Clear();
+        LineBetweenPositions(projectedLocations, new Color(.75f, .75f, 2f, .5f));
+        foreach (List<Vector2> flyby in FindAllPredictedFlybys())
+            LineBetweenPositions(flyby, new Color(1f, 1f, 0f, 1f));
     }
 }

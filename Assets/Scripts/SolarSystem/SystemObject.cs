@@ -20,26 +20,35 @@ public class SystemObject : MonoBehaviour
     protected Vector2 velocity;
 
     protected List<Vector2> projectedLocations;
-    Vector2 lastProjectedVelocity;
+    List<Vector2> projectedVelocities;
 
-    static Vector2 frameScale = new Vector2(0.01f, 0.01f);
+    static Vector2 frameScale = new Vector2(0.0025f, 0.0025f);
 
     // Start is called before the first frame update
     virtual protected void Start()
     {
         velocity = initialVelocity;
         projectedLocations = new List<Vector2>();
+        projectedVelocities = new List<Vector2>();
     }
 
-    virtual public void PerFrameActions()
+    virtual public void ComputeNewLocations()
     {
         projectedLocations.Clear();
+        projectedVelocities.Clear();
         for (int i = 0; i < frames_lookahead; i++)
             AddProjectedLocation(i);
-        foreach (GameObject parent in gravityParents)
-            velocity += VelocityVectorDelta(parent, 0);
-        transform.position = (Vector2)transform.position + Vector2.Scale(velocity, frameScale);
-        lastProjectedVelocity = velocity;
+    }
+
+    public void MoveToNextLocation(int gameSpeed)
+    {
+        transform.position = projectedLocations[gameSpeed - 1];
+        velocity = projectedVelocities[gameSpeed - 1];
+    }
+
+    virtual protected GameObject[] ActiveGravityParents(int iFramePlus)
+    {
+        return gravityParents;
     }
 
     public Vector2 PositionAtTime(int framePlus)
@@ -62,7 +71,7 @@ public class SystemObject : MonoBehaviour
         SystemObject parentSystemObject = parent.GetComponent<SystemObject>();
         float pull = parentSystemObject.gravityPull;
         Vector2 parentPosition = parentSystemObject.PositionAtTime(framePlus);
-        Vector2 myPosition = PositionAtTime(framePlus - 1);
+        Vector2 myPosition = PositionAtTime(framePlus);
         float invSquare = 1.0f / (Vector2.Distance(parentPosition, myPosition) * Vector2.Distance(parentPosition, myPosition));
         Vector2 normalizedDirection = (parentPosition - myPosition).normalized;
         return new Vector2(normalizedDirection.x * pull * invSquare, normalizedDirection.y * pull * invSquare);
@@ -70,11 +79,17 @@ public class SystemObject : MonoBehaviour
 
     protected void AddProjectedLocation(int framePlus)
     {
-        foreach (GameObject parent in gravityParents)
-            lastProjectedVelocity += VelocityVectorDelta(parent, framePlus);
-        if (framePlus == 0)
-            projectedLocations.Add((Vector2)transform.position + Vector2.Scale(lastProjectedVelocity, frameScale));
+        if (framePlus == 0) {
+            projectedVelocities.Add(velocity);
+            projectedLocations.Add((Vector2)transform.position);
+        }
         else
-            projectedLocations.Add(projectedLocations[framePlus - 1] + Vector2.Scale(lastProjectedVelocity, frameScale));
+        {
+            projectedVelocities.Add(projectedVelocities[framePlus - 1]);
+            projectedLocations.Add(projectedLocations[framePlus - 1]);
+        }
+        foreach (GameObject parent in ActiveGravityParents(framePlus - 1))
+            projectedVelocities[framePlus] += VelocityVectorDelta(parent, framePlus - 1);
+        projectedLocations[framePlus] += Vector2.Scale(projectedVelocities.Last(), frameScale);
     }
 }
