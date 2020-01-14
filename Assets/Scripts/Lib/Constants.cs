@@ -4,6 +4,6 @@ using UnityEngine;
 
 public static class Constants
 {
-    const float SYSTEM_ZOOM = 5f;
-    const float PLANET_ZOOM = 1f;
+    public const float SYSTEM_ZOOM = 5f;
+    public const float PLANET_ZOOM = 1f;
 }

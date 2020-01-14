@@ -16,7 +16,7 @@ public class CameraController : MonoBehaviour
 
     float GetMoveSpeed()
     {
-        float currSize = camera.orthographicSize;
+        float currSize = GetComponent<Camera>().orthographicSize;
         if (currSize > Constants.SYSTEM_ZOOM - 1)
         {
             return 0.2f - (currSize - Constants.SYSTEM_ZOOM) * .1f;
@@ -30,13 +30,14 @@ public class CameraController : MonoBehaviour
 
     float GetZoomSpeed()
     {
+        float currSize = GetComponent<Camera>().orthographicSize;
         if (currSize > Constants.SYSTEM_ZOOM - 1)
         {
-            return 0.1f - (currSize - Constants.SYSTEM_ZOOM) * .05f;
+            return 0.1f - ((currSize - Constants.SYSTEM_ZOOM) * .05f);
         }
         if (currSize < Constants.PLANET_ZOOM + 1)
         {
-            return 0.1f - (Constants.PLANET_ZOOM - currSize) * .05f;
+            return 0.1f - ((Constants.PLANET_ZOOM - currSize) * .05f);
         }
         return .1f;
     }
@@ -44,11 +45,20 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (camera.orthographicSize > targetViewPortSize) camera.orthographicSize -= GetZoomSpeed();
-        if (camera.orthographicSize < targetViewPortSize) camera.orthographicSize += GetZoomSpeed();
+        Camera camera = GetComponent<Camera>();
+        float currSize = camera.orthographicSize;
+        if (camera.orthographicSize > targetViewPortSize)
+        {
+            camera.orthographicSize -= GetZoomSpeed();
+            camera.orthographicSize = camera.orthographicSize < targetViewPortSize ? targetViewPortSize : camera.orthographicSize;
+        }
+        else if (camera.orthographicSize < targetViewPortSize)
+        {
+            camera.orthographicSize += GetZoomSpeed();
+            camera.orthographicSize = camera.orthographicSize > targetViewPortSize ? targetViewPortSize : camera.orthographicSize;
+        }
         Vector3 pos = Vector2.MoveTowards(transform.position, targetLocation, GetMoveSpeed());
         pos.z = -10;
         transform.position = pos;
-        Camera camera = GetComponent<Camera>();
     }
 }

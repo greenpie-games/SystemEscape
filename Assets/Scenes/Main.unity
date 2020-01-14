@@ -2193,7 +2193,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravityPull: 0
-  initialVelocity: {x: -0.01, y: 0}
+  initialVelocity: {x: -0.01, y: 0.1}
   gravityParents:
   - {fileID: 2089962303}
   - {fileID: 360446240}

@@ -46,9 +46,9 @@ public class SystemObject : MonoBehaviour
         velocity = projectedVelocities[gameSpeed - 1];
     }
 
-    virtual protected GameObject[] PrimaryGravityParent(int iFramePlus)
+    virtual protected GameObject PrimaryGravityParent(int iFramePlus)
     {
-        if (gravityParents.Count == 0) return null;
+        if (gravityParents.Count() == 0) return null;
         return gravityParents[0];
     }
 
@@ -93,7 +93,7 @@ public class SystemObject : MonoBehaviour
         while (parent != null)
         {
             projectedVelocities[framePlus] += VelocityVectorDelta(parent, framePlus - 1);
-            parent = parent.PrimaryGravityParent(framePlus - 1);
+            parent = parent.GetComponent<SystemObject>().PrimaryGravityParent(framePlus - 1);
         }
         projectedLocations[framePlus] += Vector2.Scale(projectedVelocities.Last(), frameScale);
     }
