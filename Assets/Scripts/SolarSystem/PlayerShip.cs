@@ -27,10 +27,10 @@ public class PlayerShip : SystemObject
         lookAheadLines.Add(line);
     }
 
-    override protected GameObject[] ActiveGravityParents(int iFramePlus)
+    override protected GameObject PrimaryGravityParent(int iFramePlus)
     {
-        if (FindNearbyParent(iFramePlus) == null) return gravityParents;
-        return new GameObject[2] { gravityParents[0], FindNearbyParent(iFramePlus) };
+        if (FindNearbyParent(iFramePlus) == null) return gravityParents[0];
+        return FindNearbyParent(iFramePlus);
     }
 
     // Finds a nearby parent (if there is one)

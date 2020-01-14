@@ -28,13 +28,13 @@ public class SystemManager : MonoBehaviour
         if (player.FindNearbyParent(-1) != null)
         {
             mainCameraController.targetLocation = player.FindNearbyParent(-1).transform.position;
-            mainCameraController.targetViewPortSize = 1f;
+            mainCameraController.targetViewPortSize = Constants.PLANET_ZOOM;
             gameSpeed = 1;
         }
         else
         {
             mainCameraController.targetLocation = new Vector2(0f, 0f);
-            mainCameraController.targetViewPortSize = 5f;
+            mainCameraController.targetViewPortSize = Constants.SYSTEM_ZOOM;
         }
         foreach (SystemObject o in systemObjects)
             o.ComputeNewLocations();
