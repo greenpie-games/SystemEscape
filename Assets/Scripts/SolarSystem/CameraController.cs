@@ -11,17 +11,44 @@ public class CameraController : MonoBehaviour
     void Start()
     {
         targetLocation = new Vector2(0f, 0f);
-        targetViewPortSize = 5f;
+        targetViewPortSize = Constants.SYSTEM_ZOOM;
+    }
+
+    float GetMoveSpeed()
+    {
+        float currSize = camera.orthographicSize;
+        if (currSize > Constants.SYSTEM_ZOOM - 1)
+        {
+            return 0.2f - (currSize - Constants.SYSTEM_ZOOM) * .1f;
+        }
+        if (currSize < Constants.PLANET_ZOOM + 1)
+        {
+            return 0.2f - (Constants.PLANET_ZOOM - currSize) * .1f;
+        }
+        return 0.2f;
+    }
+
+    float GetZoomSpeed()
+    {
+        if (currSize > Constants.SYSTEM_ZOOM - 1)
+        {
+            return 0.1f - (currSize - Constants.SYSTEM_ZOOM) * .05f;
+        }
+        if (currSize < Constants.PLANET_ZOOM + 1)
+        {
+            return 0.1f - (Constants.PLANET_ZOOM - currSize) * .05f;
+        }
+        return .1f;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 pos = Vector2.MoveTowards(transform.position, targetLocation, 0.2f);
+        if (camera.orthographicSize > targetViewPortSize) camera.orthographicSize -= GetZoomSpeed();
+        if (camera.orthographicSize < targetViewPortSize) camera.orthographicSize += GetZoomSpeed();
+        Vector3 pos = Vector2.MoveTowards(transform.position, targetLocation, GetMoveSpeed());
         pos.z = -10;
         transform.position = pos;
         Camera camera = GetComponent<Camera>();
-        if (camera.orthographicSize > targetViewPortSize) camera.orthographicSize -= 0.1f;
-        if (camera.orthographicSize < targetViewPortSize) camera.orthographicSize += 0.1f;
     }
 }
