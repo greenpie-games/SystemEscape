@@ -108,9 +108,9 @@ public class PlayerShip : SystemObject
         if (Input.GetKey(KeyCode.S))
             velocity -= (Vector2)(0.005f * gameSpeed * transform.up);
         if (Input.GetKey(KeyCode.A))
-            transform.Rotate(Vector3.forward * 1.5f * gameSpeed);
+            transform.Rotate(Vector3.forward * 1.75f);
         if (Input.GetKey(KeyCode.D))
-            transform.Rotate(Vector3.forward * -1.5f * gameSpeed);
+            transform.Rotate(Vector3.forward * -1.75f);
         base.ComputeNewLocations(gameSpeed);
     }
 }
