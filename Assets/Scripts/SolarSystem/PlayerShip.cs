@@ -22,12 +22,13 @@ public class PlayerShip : SystemObject
         for (int i = 0; i < positions.Count; i++)
             vec3Positions[i] = (Vector3)positions[i];
         line.SetPositions(vec3Positions);
+        line.material = new Material(Shader.Find("Sprites/Default"));
+        Color color = new Color(1f, 0f, 1f, 1f);
         if (flyByColor)
         {
-            line.material = new Material(Shader.Find("Sprites/Default"));
-            Color color = new Color(1f, 1f, 0f, 1f);
-            line.SetColors(color, color);
+            color = new Color(1f, 1f, 0f, 1f);
         }
+        line.SetColors(color, color);
         lookAheadLines.Add(line);
     }
 
@@ -103,13 +104,13 @@ public class PlayerShip : SystemObject
     override public void ComputeNewLocations(int gameSpeed)
     {
         if (Input.GetKey(KeyCode.W))
-            velocity.y += 0.005f * gameSpeed;
+            velocity += (Vector2)(0.005f * gameSpeed * transform.up);
         if (Input.GetKey(KeyCode.S))
-            velocity.y -= 0.005f * gameSpeed;
+            velocity -= (Vector2)(0.005f * gameSpeed * transform.up);
         if (Input.GetKey(KeyCode.A))
-            velocity.x -= 0.005f * gameSpeed;
+            transform.Rotate(Vector3.forward * 1.5f * gameSpeed);
         if (Input.GetKey(KeyCode.D))
-            velocity.x += 0.005f * gameSpeed;
+            transform.Rotate(Vector3.forward * -1.5f * gameSpeed);
         base.ComputeNewLocations(gameSpeed);
     }
 }
