@@ -32,7 +32,7 @@ public class SystemObject : MonoBehaviour
         projectedVelocities = new List<Vector2>();
     }
 
-    virtual public void ComputeNewLocations()
+    virtual public void ComputeNewLocations(int gameSpeed)
     {
         projectedLocations.Clear();
         projectedVelocities.Clear();
@@ -65,6 +65,16 @@ public class SystemObject : MonoBehaviour
             myPosition = projectedLocations[framePlus];
         }
         return myPosition;
+    }
+
+    virtual public void HandlePostMoveDraws()
+    {
+
+    }
+
+    public Vector2 NetDelta(int framePlus)
+    {
+        return projectedLocations[framePlus] - projectedLocations[0];
     }
 
     Vector2 VelocityVectorDelta(GameObject parent, int framePlus)

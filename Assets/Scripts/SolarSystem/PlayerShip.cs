@@ -9,7 +9,7 @@ public class PlayerShip : SystemObject
     List<LineRenderer> lookAheadLines;
     [SerializeField]
 
-    void LineBetweenPositions(List<Vector2> positions, Color color)
+    void LineBetweenPositions(List<Vector2> positions, bool flyByColor)
     {
         GameObject lineObject = new GameObject("Line");
         LineRenderer line = lineObject.AddComponent(typeof(LineRenderer)) as LineRenderer;
@@ -22,8 +22,12 @@ public class PlayerShip : SystemObject
         for (int i = 0; i < positions.Count; i++)
             vec3Positions[i] = (Vector3)positions[i];
         line.SetPositions(vec3Positions);
-        line.material = new Material(Shader.Find("Sprites/Default"));
-        line.SetColors(color, color);
+        if (flyByColor)
+        {
+            line.material = new Material(Shader.Find("Sprites/Default"));
+            Color color = new Color(1f, 1f, 0f, 1f);
+            line.SetColors(color, color);
+        }
         lookAheadLines.Add(line);
     }
 
@@ -42,24 +46,16 @@ public class PlayerShip : SystemObject
         return null;
     }
 
-    // Finds any flybys in the player's predicted trajectory.
-    List<List<Vector2>> FindAllPredictedFlybys()
+    // For each location in player's trajectory, returns true if it is a flyby.
+    List<bool> FindAllPredictedFlybys()
     {
-        bool flyByInProgress = false;
-        List<List<Vector2>> output = new List<List<Vector2>> { };
+        List<bool> output = new List<bool> { };
         for (int i = 0; i < frames_lookahead; i++)
         {
             if (FindNearbyParent(i))
-            {
-                if (!flyByInProgress)
-                    output.Add(new List<Vector2> { });
-                output.Last().Add(PositionAtTime(i));
-                flyByInProgress = true;
-            }
+                output.Add(true);
             else
-            {
-                flyByInProgress = false;
-            }
+                output.Add(false);
         }
         return output;
     }
@@ -71,22 +67,49 @@ public class PlayerShip : SystemObject
         lookAheadLines = new List<LineRenderer> { };
     }
 
-    override public void ComputeNewLocations()
+    // Normalize predicted future locations by parent position
+    override public void HandlePostMoveDraws()
     {
-        if (Input.GetKey(KeyCode.W))
-            velocity.y += 0.01f;
-        if (Input.GetKey(KeyCode.S))
-            velocity.y -= 0.01f;
-        if (Input.GetKey(KeyCode.A))
-            velocity.x -= 0.01f;
-        if (Input.GetKey(KeyCode.D))
-            velocity.x += 0.01f;
-        base.ComputeNewLocations();
+        // Clear old draws.
         foreach (LineRenderer line in lookAheadLines)
             Destroy(line.gameObject);
         lookAheadLines.Clear();
-        LineBetweenPositions(projectedLocations, new Color(.75f, .75f, 2f, .5f));
-        foreach (List<Vector2> flyby in FindAllPredictedFlybys())
-            LineBetweenPositions(flyby, new Color(1f, 1f, 0f, 1f));
+
+        // Get flyBys *BEFORE* position normalization.
+        List<bool> flyBys = FindAllPredictedFlybys();
+
+        // Normalize drawn display positions to primary parent's position
+        SystemObject parent = PrimaryGravityParent(0).GetComponent<SystemObject>();
+        for (int i = 0; i < frames_lookahead; i++)
+            projectedLocations[i] -= parent.NetDelta(i);
+
+        // Find all flyBys and draw them in a different color than non-flyBys.
+        bool flyByInProgress = flyBys[0];
+        List<Vector2> flyBy = new List<Vector2> { };
+        for (int i = 0; i < frames_lookahead; i++)
+        {
+            flyBy.Add(projectedLocations[i]);
+            // Flyby status changed, time to start a new line.
+            if (flyByInProgress != flyBys[i])
+            {
+                LineBetweenPositions(flyBy, flyByInProgress);
+                flyBy = new List<Vector2> { };
+                flyByInProgress = !flyByInProgress;
+            }
+        }
+        LineBetweenPositions(flyBy, flyByInProgress);
+    }
+
+    override public void ComputeNewLocations(int gameSpeed)
+    {
+        if (Input.GetKey(KeyCode.W))
+            velocity.y += 0.005f * gameSpeed;
+        if (Input.GetKey(KeyCode.S))
+            velocity.y -= 0.005f * gameSpeed;
+        if (Input.GetKey(KeyCode.A))
+            velocity.x -= 0.005f * gameSpeed;
+        if (Input.GetKey(KeyCode.D))
+            velocity.x += 0.005f * gameSpeed;
+        base.ComputeNewLocations(gameSpeed);
     }
 }
