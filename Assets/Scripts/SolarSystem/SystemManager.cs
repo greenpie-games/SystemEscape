@@ -39,6 +39,9 @@ public class SystemManager : MonoBehaviour
         foreach (SystemObject o in systemObjects)
             o.ComputeNewLocations();
         foreach (SystemObject o in systemObjects)
+        {
             o.MoveToNextLocation(gameSpeed);
+            o.CheckReferenceFrame(gameSpeed);
+        }
     }
 }

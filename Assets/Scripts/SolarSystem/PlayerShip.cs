@@ -37,8 +37,15 @@ public class PlayerShip : SystemObject
     public GameObject FindNearbyParent(int framePlus)
     {
         foreach (GameObject parent in gravityParents)
-            if (Vector2.Distance(parent.GetComponent<SystemObject>().PositionAtTime(framePlus), PositionAtTime(framePlus)) < 0.4f)
+        {
+            if (parent == activeParent)
+            {
+                if (Vector2.Distance(parent.GetComponent<SystemObject>().PositionAtTime(0), PositionAtTime(framePlus)) < 0.4f)
+                    return parent;
+            }
+            else if (Vector2.Distance(parent.GetComponent<SystemObject>().PositionAtTime(framePlus), PositionAtTime(framePlus)) < 0.4f)
                 return parent;
+        }
         return null;
     }
 

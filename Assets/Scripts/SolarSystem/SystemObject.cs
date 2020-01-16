@@ -17,6 +17,8 @@ public class SystemObject : MonoBehaviour
     [SerializeField]
     protected GameObject[] gravityParents;
 
+    protected GameObject activeParent;
+
     protected Vector2 velocity;
 
     protected List<Vector2> projectedLocations;
@@ -27,6 +29,8 @@ public class SystemObject : MonoBehaviour
     // Start is called before the first frame update
     virtual protected void Start()
     {
+        if (gravityParents.Count() > 0)
+            activeParent = gravityParents[0];
         velocity = initialVelocity;
         projectedLocations = new List<Vector2>();
         projectedVelocities = new List<Vector2>();
@@ -71,30 +75,46 @@ public class SystemObject : MonoBehaviour
     {
         SystemObject parentSystemObject = parent.GetComponent<SystemObject>();
         float pull = parentSystemObject.gravityPull;
-        Vector2 parentPosition = parentSystemObject.PositionAtTime(framePlus);
+        Vector2 parentPosition = parentSystemObject.PositionAtTime(0);
         Vector2 myPosition = PositionAtTime(framePlus);
         float invSquare = 1.0f / (Vector2.Distance(parentPosition, myPosition) * Vector2.Distance(parentPosition, myPosition));
         Vector2 normalizedDirection = (parentPosition - myPosition).normalized;
         return new Vector2(normalizedDirection.x * pull * invSquare, normalizedDirection.y * pull * invSquare);
     }
 
+    public void CheckReferenceFrame(int framePlus)
+    {
+        GameObject parent = PrimaryGravityParent(framePlus - 1);
+        if (parent != activeParent)
+            OnReferenceFrameChange(activeParent, parent);
+    }
+
+    private void OnReferenceFrameChange(GameObject oldParent, GameObject newParent)
+    {
+        velocity += oldParent.GetComponent<SystemObject>().velocity;
+        velocity -= newParent.GetComponent<SystemObject>().velocity;
+        activeParent = newParent;
+    }
+
     protected void AddProjectedLocation(int framePlus)
     {
+        GameObject parent = PrimaryGravityParent(framePlus - 1);
         if (framePlus == 0) {
             projectedVelocities.Add(velocity);
             projectedLocations.Add((Vector2)transform.position);
+            if (parent != null)
+            {
+                projectedLocations[0] += Vector2.Scale(parent.GetComponent<SystemObject>().projectedVelocities[0], frameScale);
+                projectedVelocities[0] += VelocityVectorDelta(parent, -1);
+            }
         }
         else
         {
             projectedVelocities.Add(projectedVelocities[framePlus - 1]);
             projectedLocations.Add(projectedLocations[framePlus - 1]);
+            if (parent != null)
+                projectedVelocities[framePlus] += VelocityVectorDelta(parent, framePlus - 1);
         }
-        GameObject parent = PrimaryGravityParent(framePlus - 1);
-        while (parent != null)
-        {
-            projectedVelocities[framePlus] += VelocityVectorDelta(parent, framePlus - 1);
-            parent = parent.GetComponent<SystemObject>().PrimaryGravityParent(framePlus - 1);
-        }
-        projectedLocations[framePlus] += Vector2.Scale(projectedVelocities.Last(), frameScale);
+        projectedLocations[framePlus] += Vector2.Scale(projectedVelocities[framePlus], frameScale);
     }
 }
