@@ -37,8 +37,10 @@ public class SystemManager : MonoBehaviour
             mainCameraController.targetViewPortSize = Constants.SYSTEM_ZOOM;
         }
         foreach (SystemObject o in systemObjects)
-            o.ComputeNewLocations();
+            o.ComputeNewLocations(gameSpeed);
         foreach (SystemObject o in systemObjects)
             o.MoveToNextLocation(gameSpeed);
+        foreach (SystemObject o in systemObjects)
+            o.HandlePostMoveDraws();
     }
 }
