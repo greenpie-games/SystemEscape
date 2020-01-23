@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System.Linq;
 
 public class SystemManager : MonoBehaviour
@@ -14,6 +15,9 @@ public class SystemManager : MonoBehaviour
 
     [SerializeField]
     CameraController mainCameraController;
+
+    [SerializeField]
+    Text instructionText;
 
     // Start is called before the first frame update
     void Start()
@@ -36,6 +40,10 @@ public class SystemManager : MonoBehaviour
             mainCameraController.targetLocation = new Vector2(0f, 0f);
             mainCameraController.targetViewPortSize = Constants.SYSTEM_ZOOM;
         }
+        if (player.IsInOrbitAroundPlanet())
+            instructionText.text = "Space: release lander";
+        else
+            instructionText.text = "WS/AD keys: Thrust/Turn";
         foreach (SystemObject o in systemObjects)
             o.ComputeNewLocations(gameSpeed);
         foreach (SystemObject o in systemObjects)
