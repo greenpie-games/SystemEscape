@@ -25,11 +25,17 @@ public class PlayerShip : SystemObject
         line.material = new Material(Shader.Find("Sprites/Default"));
         Color color = new Color(1f, 0f, 1f, 1f);
         if (flyByColor)
-        {
             color = new Color(1f, 1f, 0f, 1f);
-        }
         line.SetColors(color, color);
         lookAheadLines.Add(line);
+    }
+
+    // Returns TRUE if the predicted path stays around current gravity parent indefinitely.
+    public bool IsInOrbitAroundPlanet()
+    {
+        if (PrimaryGravityParent(0) == gravityParents[0])
+            return false;
+        return (lookAheadLines.Count == 1);
     }
 
     override protected GameObject PrimaryGravityParent(int iFramePlus)
