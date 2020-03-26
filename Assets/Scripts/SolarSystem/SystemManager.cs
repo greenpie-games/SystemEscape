@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
@@ -41,7 +42,11 @@ public class SystemManager : MonoBehaviour
             mainCameraController.targetViewPortSize = Constants.SYSTEM_ZOOM;
         }
         if (player.IsInOrbitAroundPlanet())
+        {
             instructionText.text = "Space: release lander";
+            if (Input.GetKey(KeyCode.Space))
+                SceneManager.LoadScene(Constants.SCENE_PLANET);
+        }
         else
             instructionText.text = "WS/AD keys: Thrust/Turn";
         foreach (SystemObject o in systemObjects)
