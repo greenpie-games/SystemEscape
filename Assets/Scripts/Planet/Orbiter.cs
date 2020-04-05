@@ -6,7 +6,7 @@ public class Orbiter : MonoBehaviour
 {
     [SerializeField]
     public float angle = 0.0f;
-    private float radius = 6.0f;
+    private float radius = 15.0f;
     private float speed = -0.001f;
     public Vector2 velocity;
 

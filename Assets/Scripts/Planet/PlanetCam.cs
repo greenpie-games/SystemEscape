@@ -15,13 +15,13 @@ public class PlanetCam : MonoBehaviour
         transform.position = new Vector3(toCenter.transform.position.x, toCenter.transform.position.y, -10f);
         float angle = Mathf.Atan2(transform.position.y, transform.position.x) * Mathf.Rad2Deg - 90f;
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-        if (Mathf.Sqrt(transform.position.x * transform.position.x + transform.position.y * transform.position.y) < 4f)
+        if (Mathf.Sqrt(transform.position.x * transform.position.x + transform.position.y * transform.position.y) < 11.5f)
         {
-            desiredCameraSize = 2f;
+            desiredCameraSize = 2.5f;
         }
         else
         {
-            desiredCameraSize = 5f;
+            desiredCameraSize = 7.5f;
         }
         if (desiredCameraSize < GetComponent<Camera>().orthographicSize)
         {
