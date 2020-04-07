@@ -7,7 +7,7 @@ public class Orbiter : MonoBehaviour
     [SerializeField]
     public float angle = 0.0f;
     private float radius = 15.0f;
-    private float speed = -0.001f;
+    private float speed = -0.002f;
     public Vector2 velocity;
 
     // Update is called once per frame
